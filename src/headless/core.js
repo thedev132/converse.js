@@ -38,6 +38,7 @@ import {
     initClientConfig,
     initPlugins,
     initSessionStorage,
+    initScramStorage,
     registerGlobalEventHandlers,
     setUserJID,
 } from './utils/init.js';
@@ -476,14 +477,14 @@ export const api = _converse.api = {
 
     /**
      * Fetch previously used login information, username and SCRAM keys if available
-     * @method _converse.api.getSavedLoginInfo
+     * @method _converse.api.savedLoginInfo
      * @returns {Promise} A promise which resolves (or potentially rejects) once we
      *  fetch the previously used login keys.
      */
     async savedLoginInfo () {
         const id = "converse.savedLoginInfo";
         let login_info = new Model({id});
-        initStorage(login_info, id, 'session');
+        initStorage(login_info, id, 'scramStorage');
         await new Promise(f => login_info.fetch({'success': f, 'error': f}));
 
         return login_info;
@@ -732,7 +733,7 @@ Object.assign(converse, {
      */
     savedLoginInfo: async () => {
             if (!_converse.storage) {
-                await initSessionStorage(_converse);
+                await initScramStorage(_converse);
             }
             return _converse.api.savedLoginInfo()
     },

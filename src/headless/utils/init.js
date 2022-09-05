@@ -87,6 +87,17 @@ export async function initSessionStorage (_converse) {
     };
 }
 
+export async function initScramStorage (_converse) {
+    _converse.storage = {
+        ..._converse.storage,
+        'scramStorage': Storage.localForage.createInstance({
+            'name': 'converse-scram',
+            'description': 'SCRAM storage driver',
+            'driver': Storage.localForage.INDEXEDDB
+        })
+    };
+}
+
 function initPersistentStorage (_converse, store_name) {
     if (_converse.api.settings.get('persistent_store') === 'sessionStorage') {
         return;
@@ -363,7 +374,11 @@ function connect (credentials) {
             const login_info = await _converse.api.savedLoginInfo();
 
             callback = async (status) => {
-                // Save scram keys in localstorage
+                // Store scram keys in scram storage
+                if (!_converse?.storage?.scramStorage) {
+                    await initScramStorage(_converse);
+                }
+
                 const newScramKeys = _converse.connection.scramKeys;
                 if (newScramKeys) {
                     try {

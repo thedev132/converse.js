@@ -444,6 +444,9 @@ which are valid login credentials (which can be passed in as the
 From here, one may configure their client to simply choose one of the logins,
 depending on their needs, and pass the username and credentials into the
 settings.
+Note well that this method will only work once converse has been loaded.
+If you need the utilities provided here before login, call
+`window.converse.load()`.
 
 
 auto_away
