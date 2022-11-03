@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add the ability to reset your password
 - Add a "Add to Contacts" button in MUC occupant modals
 
 ## 10.0.0 (2022-10-30)

@@ -4,12 +4,12 @@ import { _converse } from  "@converse/headless/core";
 import { html } from "lit";
 
 
-const passwordreset_page = () => html`
+const tpl_passwordreset_page = () => html`
     <div class="tab-pane" id="passwordreset-tabpanel" role="tabpanel" aria-labelledby="passwordreset-tab">
-        <converse-changepassword-profile></converse-changepassword-profile>
+        <converse-change-password-form></converse-change-password-form>
     </div>`;
 
-const omemo_page = (el) => html`
+const tpl_omemo_page = (el) => html`
     <div class="tab-pane ${ el.tab === 'omemo' ? 'active' : ''}" id="omemo-tabpanel" role="tabpanel" aria-labelledby="omemo-tab">
         <converse-omemo-profile></converse-omemo-profile>
     </div>`;
@@ -28,6 +28,7 @@ export default (el) => {
 
     const i18n_omemo = __('OMEMO');
     const i18n_profile = __('Profile');
+    const ii18n_reset_password = __('Reset Password');
 
     const navigation_tabs = [
         html`<li role="presentation" class="nav-item">
@@ -36,22 +37,20 @@ export default (el) => {
                href="#profile-tabpanel"
                aria-controls="profile-tabpanel"
                role="tab"
-               data-toggle="tab">${i18n_profile}</a>
+               data-toggle="tab">${ i18n_profile }</a>
             </li>`
     ];
 
-    if (_converse.pluggable.plugins['converse-passwordreset']?.enabled(_converse)) {
-        navigation_tabs.push(
-            html`<li role="presentation" class="nav-item">
-                <a class="nav-link"
-                   id="passwordreset-tab"
-                   href="#passwordreset-tabpanel"
-                   aria-controls="passwordreset-tabpanel"
-                   role="tab"
-                   data-toggle="tab">Reset Password</a>
-            </li>`
-        );
-    }
+    navigation_tabs.push(
+        html`<li role="presentation" class="nav-item">
+            <a class="nav-link"
+                id="passwordreset-tab"
+                href="#passwordreset-tabpanel"
+                aria-controls="passwordreset-tabpanel"
+                role="tab"
+                data-toggle="tab">${ ii18n_reset_password }</a>
+        </li>`
+    );
 
     if (_converse.pluggable.plugins['converse-omemo']?.enabled(_converse)) {
         navigation_tabs.push(
@@ -60,16 +59,13 @@ export default (el) => {
                    id="omemo-tab"
                    href="#omemo-tabpanel"
                    aria-controls="omemo-tabpanel"
-                   role="tab" data-toggle="tab">${i18n_omemo}</a>
+                   role="tab" data-toggle="tab">${ i18n_omemo }</a>
             </li>`
         );
     }
 
-    // Don't display any navigation tabs if only the profile tab is available
-    const navigation = ((navigation_tabs.length == 1) ? html`` : html`<ul class="nav nav-pills justify-content-center">${navigation_tabs}</ul>`);
-
     return html`
-        ${navigation}
+        <ul class="nav nav-pills justify-content-center">${navigation_tabs}</ul>
         <div class="tab-content">
             <div class="tab-pane ${ el.tab === 'profile' ? 'active' : ''}" id="profile-tabpanel" role="tabpanel" aria-labelledby="profile-tab">
                 <form class="converse-form converse-form--modal profile-form" action="#" @submit=${ev => el.onFormSubmitted(ev)}>
@@ -111,8 +107,8 @@ export default (el) => {
                     </div>
                 </form>
             </div>
-            ${ _converse.pluggable.plugins['converse-passwordreset']?.enabled(_converse) ? passwordreset_page() : '' }
-            ${ _converse.pluggable.plugins['converse-omemo']?.enabled(_converse) ? omemo_page() : '' }
+            ${ _converse.pluggable.plugins['converse-passwordreset']?.enabled(_converse) ? tpl_passwordreset_page() : '' }
+            ${ _converse.pluggable.plugins['converse-omemo']?.enabled(_converse) ? tpl_omemo_page(el) : '' }
         </div>
     </div>`;
 }
