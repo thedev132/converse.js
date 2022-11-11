@@ -160,11 +160,14 @@ describe("Service Discovery", function () {
                 'plays.shakespeare.lit',
                 'words.shakespeare.lit'
             ]);
+            const { api, domain } = _converse;
             let entity = entities.get(_converse.domain);
-            expect(entity.items.length).toBe(3);
-            expect(entity.items.pluck('jid').includes('people.shakespeare.lit')).toBeTruthy();
-            expect(entity.items.pluck('jid').includes('plays.shakespeare.lit')).toBeTruthy();
-            expect(entity.items.pluck('jid').includes('words.shakespeare.lit')).toBeTruthy();
+            expect(api.disco.entities.items(domain).length).toBe(3);
+
+            const entity_jids = api.disco.entities.items(domain).map(e => e.get('jid'));
+            expect(entity_jids.includes('people.shakespeare.lit')).toBeTruthy();
+            expect(entity_jids.includes('plays.shakespeare.lit')).toBeTruthy();
+            expect(entity_jids.includes('words.shakespeare.lit')).toBeTruthy();
             expect(entity.identities.where({'category': 'conference'}).length).toBe(1);
             expect(entity.identities.where({'category': 'directory'}).length).toBe(1);
 

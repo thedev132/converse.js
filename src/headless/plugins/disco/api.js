@@ -203,11 +203,22 @@ export default {
                 if (entity || !create) {
                     return entity;
                 }
-                return api.disco.entities.create(jid);
+                return api.disco.entities.create({ jid });
             },
 
             /**
-             * Create a new disco entity. It's identity and features
+             * Return any disco items advertised on this entity
+             *
+             * @method api.disco.entities.items
+             * @param {string} jid The Jabber ID of the entity for which we want to fetch items
+             * @example api.disco.entities.items(jid);
+             */
+            items (jid) {
+                return _converse.disco_entities.filter(e => e.get('parent_jid') === jid);
+            },
+
+            /**
+             * Create a new  disco entity. It's identity and features
              * will automatically be fetched from cache or from the
              * XMPP server.
              *
@@ -215,14 +226,17 @@ export default {
              * `ignore_cache: true` in the options parameter.
              *
              * @method api.disco.entities.create
-             * @param {string} jid The Jabber ID of the entity
-             * @param {object} [options] Additional options
+             * @param {object} data
+             * @param {string} data.jid - The Jabber ID of the entity
+             * @param {string} data.parent_jid - The Jabber ID of the parent entity
+             * @param {string} data.name
+             * @param {object} [options] - Additional options
              * @param {boolean} [options.ignore_cache]
              *     If true, fetch all features from the XMPP server instead of restoring them from cache
-             * @example _converse.api.disco.entities.create(jid, {'ignore_cache': true});
+             * @example _converse.api.disco.entities.create({ jid }, {'ignore_cache': true});
              */
-            create (jid, options) {
-                return _converse.disco_entities.create({'jid': jid}, options);
+            create (data, options) {
+                return _converse.disco_entities.create(data, options);
             }
         },
 
@@ -262,7 +276,11 @@ export default {
                     return;
                 }
                 entity = await entity.waitUntilFeaturesDiscovered;
-                const promises = [...entity.items.map(i => i.hasFeature(feature)), entity.hasFeature(feature)];
+
+                const promises = [
+                    entity.hasFeature(feature),
+                    ...api.disco.entities.items(jid).map(i => i.hasFeature(feature))
+                ];
                 const result = await Promise.all(promises);
                 return result.filter(isObject);
             }
@@ -316,7 +334,7 @@ export default {
                 entity.queryInfo();
             } else {
                 // Create it if it doesn't exist
-                entity = await api.disco.entities.create(jid, {'ignore_cache': true});
+                entity = await api.disco.entities.create({ jid }, {'ignore_cache': true});
             }
             return entity.waitUntilFeaturesDiscovered;
         },
